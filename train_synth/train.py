@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from src.generic_model import Criterian
-from .dataloader import DataLoaderSYNTH
+from .dataloader import DataLoader_VN_SYNTH
 from src.utils.data_manipulation import denormalize_mean_variance
 import train_synth.config as config
 from src.utils.parallel import DataParallelModel, DataParallelCriterion
@@ -17,7 +17,7 @@ from src.utils.utils import calculate_batch_fscore, generate_word_bbox_batch, _i
 os.environ['CUDA_VISIBLE_DEVICES'] = str(config.num_cuda)
 
 
-def save(data, output, target, target_affinity, drawn_image, no):
+def save(data, output, target, target_affinity, no):
 
 	"""
 	Saving the synthesised outputs in between the training
@@ -33,11 +33,11 @@ def save(data, output, target, target_affinity, drawn_image, no):
 	data = data.data.cpu().numpy()
 	target = target.data.cpu().numpy()
 	target_affinity = target_affinity.data.cpu().numpy()
-	drawn_image = drawn_image.data.cpu().numpy()
+	# drawn_image = drawn_image.data.cpu().numpy()
 
 	batch_size = output.shape[0]
 
-	base = config.DataLoaderSYNTH_Train_Synthesis+str(no)+'/'
+	base = config.DataLoader_VN_SYNTH_Train_Synthesis+str(no)+'/'
 
 	os.makedirs(base, exist_ok=True)
 
@@ -75,10 +75,10 @@ def save(data, output, target, target_affinity, drawn_image, no):
 			np.float32(affinity_bbox > config.threshold_affinity)
 		)
 
-		plt.imsave(
-			base + str(i) + '/drawn_image.png',
-			drawn_image[i]
-		)
+		# plt.imsave(
+		# 	base + str(i) + '/drawn_image.png',
+		# 	drawn_image[i]
+		# )
 
 
 def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, all_accuracy):
@@ -98,7 +98,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 	model.train()
 	optimizer.zero_grad()
 	iterator = tqdm(dataloader)
-
+	print("iteraror", iterator)
 	def change_lr(no_i):
 
 		for i in config.lr:
@@ -107,7 +107,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 				for param_group in optimizer.param_groups:
 					param_group['lr'] = config.lr[i]
 
-	for no, (image, weight, weight_affinity, drawn_image) in enumerate(iterator):
+	for no, (image, weight, weight_affinity) in enumerate(iterator):
 
 		change_lr(no)
 
@@ -131,37 +131,39 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 		if (no + 1) % config.optimizer_iteration == 0:
 			optimizer.step()
 			optimizer.zero_grad()
-
 		if no >= 2000:
 
 			# Calculating the f-score after some iterations because initially there are a lot of stray contours
+			try:
+				if no % config.periodic_fscore == 0:
 
-			if no % config.periodic_fscore == 0:
+					if type(output) == list:
+						output = torch.cat(output, dim=0)
 
-				if type(output) == list:
-					output = torch.cat(output, dim=0)
-
-				predicted_bbox = generate_word_bbox_batch(
-					output[:, 0, :, :].data.cpu().numpy(),
-					output[:, 1, :, :].data.cpu().numpy(),
-					character_threshold=config.threshold_character,
-					affinity_threshold=config.threshold_affinity,
-					word_threshold=config.threshold_word,
-				)
-
-				target_bbox = generate_word_bbox_batch(
-					weight.data.cpu().numpy(),
-					weight_affinity.data.cpu().numpy(),
-					character_threshold=config.threshold_character,
-					affinity_threshold=config.threshold_affinity,
-					word_threshold=config.threshold_word,
-				)
-
-				all_accuracy.append(
-					calculate_batch_fscore(
-						predicted_bbox, target_bbox, threshold=config.threshold_fscore, text_target=None
+					predicted_bbox = generate_word_bbox_batch(
+						output[:, 0, :, :].data.cpu().numpy(),
+						output[:, 1, :, :].data.cpu().numpy(),
+						character_threshold=config.threshold_character,
+						affinity_threshold=config.threshold_affinity,
+						word_threshold=config.threshold_word,
 					)
-				)
+
+					target_bbox = generate_word_bbox_batch(
+						weight.data.cpu().numpy(),
+						weight_affinity.data.cpu().numpy(),
+						character_threshold=config.threshold_character,
+						affinity_threshold=config.threshold_affinity,
+						word_threshold=config.threshold_word,
+					)
+
+					all_accuracy.append(
+						calculate_batch_fscore(
+							predicted_bbox, target_bbox, threshold=config.threshold_fscore, text_target=None
+						)
+					)
+			except Exception as e:
+				print(e)
+				pass
 
 		if len(all_accuracy) == 0:
 			iterator.set_description(
@@ -185,7 +187,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 			if type(output) == list:
 				output = torch.cat(output, dim=0)
 
-			save(image, output, weight, weight_affinity, drawn_image, no)
+			save(image, output, weight, weight_affinity, no)
 
 		if no % config.periodic_save == 0 and no != 0:
 
@@ -243,11 +245,10 @@ def main():
 
 	print('Loading the dataloader')
 
-	train_dataloader = DataLoaderSYNTH('train')
+	train_dataloader = DataLoader_VN_SYNTH('train')
 	train_dataloader = DataLoader(
 		train_dataloader, batch_size=config.batch_size['train'],
 		shuffle=True, num_workers=config.num_workers['train'], worker_init_fn=_init_fn)
-
 	print('Loaded the dataloader')
 
 	all_loss = train(
@@ -258,7 +259,7 @@ def main():
 		{
 			'state_dict': model.state_dict(),
 			'optimizer': optimizer.state_dict()
-		}, config.save_path + '/final_model.pkl')
+		}, config.save_path + '/model.pkl')
 
 	np.save(config.save_path + '/loss_plot_training.npy', all_loss)
 	plt.plot(all_loss)

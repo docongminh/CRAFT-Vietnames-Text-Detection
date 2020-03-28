@@ -142,9 +142,10 @@ def synthesize(
 
 
 def generate_next_targets(original_dim, output, image, base_target_path, image_name, annots, dataloader, no):
-
-	visualize = config.visualize_generated and no % config.visualize_freq == 0 and no != 0
-
+	if 'datapile' in config.dataset_name:
+		image_name = image_name.split('/')[-1]
+	# visualize = config.visualize_generated and no % config.visualize_freq == 0 and no != 0
+	visualize = config.visualize_generated # Just for debuging
 	max_dim = original_dim.max()
 	resizing_factor = 768 / max_dim
 	before_pad_dim = [int(original_dim[0] * resizing_factor), int(original_dim[1] * resizing_factor)]
@@ -215,14 +216,12 @@ def generate_next_targets(original_dim, output, image, base_target_path, image_n
 
 	predicted_word_bbox = generated_targets['word_bbox'].copy()
 	# --------------- PostProcessing for creating the targets for the next iteration ---------------- #
-
 	generated_targets = get_weighted_character_target(
 		generated_targets, {'bbox': annots['bbox'], 'text': annots['text']},
 		dataloader.dataset.unknown,
 		config.threshold_fscore,
 		config.weight_threshold
 	)
-
 	target_word_bbox = generated_targets['word_bbox'].copy()
 
 	f_score = calculate_fscore(
@@ -440,7 +439,7 @@ def main(
 
 def generator_(base_target_path, model_path=None, model=None):
 
-	from train_weak_supervision.dataloader import DataLoaderEvalOther
+	from train_weak_supervision.dataloader import DataLoaderEvalOther_Datapile
 
 	"""
 	Generator function to generate weighted heat-maps for weak-supervision training
@@ -468,7 +467,7 @@ def generator_(base_target_path, model_path=None, model=None):
 
 	# Dataloader to pre-process images given in the dataset and provide annotations to generate weight
 
-	infer_dataloader = DataLoaderEvalOther('train')
+	infer_dataloader = DataLoaderEvalOther_Datapile('train')
 
 	infer_dataloader = DataLoader(
 		infer_dataloader, batch_size=config.batch_size['test'],

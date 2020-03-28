@@ -5,6 +5,22 @@ from .data_manipulation import two_char_bbox_to_affinity
 import math
 
 
+def get_mask(image, labels):
+	"""
+	"""
+	mask = np.zeros((image.shape[0], image.shape[1]), dtype='float32')
+	if isinstance(labels, str):
+		labels = np.array(labels.split(' ')).reshape(-1, 5)
+		for char, x, y, w, h in labels:
+			x, y, w, h = int(x), int(y), int(w), int (h)
+			if x + w >= image.shape[1] or y + h >= image.shape[0]:
+				continue
+			mask[y: y+h, x: x + w, 0] = 1
+			radius = 6
+			mask[y + h // 2 - radius: y + h // 2 + radius + 1,
+				x + w // 2 - radius: x + w // 2 + radius + 1, 1] = 1
+	return mask
+
 def order_points(box):
 
 	x_sorted_arg = np.argsort(box[:, 0])
@@ -195,8 +211,12 @@ def get_weighted_character_target(generated_targets, original_annotation, unknow
 							type = list, shape = [num_words, 2]
 		}
 	"""
+	bbox = np.array(original_annotation['bbox'])
+	if len(bbox.shape) == 2:
+		bbox = np.expand_dims(bbox, axis=0)
+		original_annotation['text'] = [original_annotation['text']]
 
-	original_annotation['bbox'] = np.array(original_annotation['bbox'], dtype=np.int64)[:, :, None, :]
+	original_annotation['bbox'] = np.array(bbox, dtype=np.int64)[:, :, None, :]
 	# Converting original annotations to the shape [num_words, 4, 1, 2]
 
 	assert len(original_annotation['bbox']) == len(original_annotation['text']), \
@@ -219,16 +239,12 @@ def get_weighted_character_target(generated_targets, original_annotation, unknow
 		found_no = -1
 
 		for no, gen_t in enumerate(generated_targets['word_bbox']):
-
-			# ToDo - For ic13, as the bbox are always horizontal we should use better calc_iou
-
 			if calc_iou(np.array(gen_t), np.array(orig_annot)) > threshold:
 				# If IOU between predicted and original word-bbox is > threshold then it is termed positive
 				found_no = no
 				break
 
 		if original_annotation['text'][orig_no] == unknown_symbol or len(original_annotation['text'][orig_no]) == 0:
-
 			"""
 				If the current original annotation was predicted by the model but the text-annotation is not present 
 				then we create character bbox using predictions and give a weight of 0.5 to the word-bbox
@@ -243,7 +259,6 @@ def get_weighted_character_target(generated_targets, original_annotation, unknow
 			aligned_generated_targets['weights'][orig_no] = [0, 0]
 
 		elif found_no == -1:
-
 			"""
 				If the current original annotation was not predicted by the model then we create equi-spaced character
 				bbox and give a weight of 0.5 to the word-bbox
@@ -554,7 +569,10 @@ def calculate_fscore(pred, target, text_target, unknown='###', text_pred=None, t
 	:param threshold: overlap iou threshold over which we say the pair is positive
 	:return:
 	"""
-
+	if len(target.shape) == 2:
+		target = np.expand_dims(target, axis=0)
+	if isinstance(text_target, str):
+		text_target = [text_target]
 	assert len(text_target) == target.shape[0], 'Some error in text target'
 
 	if pred.shape[0] == target.shape[0] == 0:
@@ -579,10 +597,11 @@ def calculate_fscore(pred, target, text_target, unknown='###', text_pred=None, t
 	for no, i in enumerate(pred):
 
 		found = False
-
+		# print('have {} target'.format(len(target)))
 		for j in range(len(target)):
 			if already_done[j]:
 				continue
+			# print('target[{}].shape = '.format(j), np.array(target[j]).shape)
 			iou = calc_iou(i, target[j])
 			if iou > threshold:
 				if check_text:
@@ -597,7 +616,6 @@ def calculate_fscore(pred, target, text_target, unknown='###', text_pred=None, t
 
 		if not found:
 			false_positive += 1
-
 	if text_target is not None:
 		true_positive = np.sum(already_done.astype(np.float32)[np.where(np.array(text_target) != unknown)[0]])
 	else:

@@ -3,9 +3,14 @@ Config containing all hardcoded parameters for training strong supervised model 
 """
 from config import *
 
-num_cuda = "0,1,2,3"
-save_path = '/home/SharedData/Mayank/Models/SYNTH'
-use_cuda = True
+
+path_images = 'dataset/train_images'
+path_labels = 'dataset/train.csv'
+ratio_split = 0.8
+#
+num_cuda = "0"
+save_path = './model'
+use_cuda = False
 
 batch_size = {
 	'train': 4*len(num_cuda.split(',')),
@@ -13,13 +18,13 @@ batch_size = {
 }
 
 num_workers = {
-	'train': 16,
-	'test': 16
+	'train': 0,
+	'test': 0
 }
 
 pretrained = False
-pretrained_path = '/home/SharedData/Mayank/Models/SYNTH/6000_model.pkl'
-pretrained_loss_plot_training = '/home/SharedData/Mayank/Models/SYNTH/loss_plot_training.npy'
+pretrained_path = './model/original.pkl'
+pretrained_loss_plot_training = './logs/loss_plot_training.npy'
 
 optimizer_iteration = 4//len(num_cuda.split(','))
 

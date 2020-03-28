@@ -1,6 +1,6 @@
-from shapely.geometry import Polygon
-import numpy as np
 import cv2
+import numpy as np
+from shapely.geometry import Polygon
 import config
 
 # Done so that the edge has a value of ~ 0.4
@@ -332,8 +332,19 @@ def generate_target_others(image_size, character_bbox, weight, type_='char'):
 	return target/255, weight_map
 
 
-def generate_affinity(image_size, character_bbox, text, weight=None):
+def add_order(target, bbox_1, bbox_2, ord1, ord2):
+	center_1 = np.mean(bbox_1, axis=0)
+	center_2 = np.mean(bbox_2, axis=0)
+	target = np.expand_dims(target, axis=-1)
+	target = cv2.putText(target, str(ord1), (int(center_1[0]), int(
+		center_1[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), lineType=cv2.LINE_AA)
+	target = cv2.putText(target, str(ord2), (int(center_2[0]), int(
+		center_2[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), lineType=cv2.LINE_AA)
+	target = np.squeeze(target, axis=-1)
+	return target
 
+
+def generate_affinity(image_size, character_bbox, text, weight=None, debug=False):
 	"""
 
 	:param image_size: shape = [3, image_height, image_width]
@@ -361,7 +372,11 @@ def generate_affinity(image_size, character_bbox, text, weight=None):
 
 	for word in text:
 		for char_num in range(len(word)-1):
-			target, bbox = add_affinity(target, character_bbox[total_letters].copy(), character_bbox[total_letters+1].copy())
+			if debug:
+				target = add_order(
+					target, character_bbox[total_letters].copy(), character_bbox[total_letters+1].copy(), total_letters, total_letters+1)
+			target, bbox = add_affinity(target, character_bbox[total_letters].copy(
+			), character_bbox[total_letters+1].copy())
 			total_letters += 1
 			all_affinity_bbox.append(bbox)
 		total_letters += 1

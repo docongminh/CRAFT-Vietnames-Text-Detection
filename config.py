@@ -1,6 +1,14 @@
+import os
 import math
 
 seed = 0
+
+dataset_name = 'datapile'
+test_dataset_name = 'datapile'
+
+DataLoader_VN_SYNTH_dataset_path = './input/SynthText.h5'
+DataLoader_VN_SYNTH_Train_Synthesis = './logs/train_synthesis/'
+num_epochs_strong_supervision = 20
 
 THRESHOLD_POSITIVE = 0.1
 THRESHOLD_NEGATIVE = 0
@@ -23,8 +31,6 @@ threshold_affinity_upper = boundary_affinity + 0.2
 scale_character = math.sqrt(math.log(boundary_character)/math.log(threshold_character_upper))
 scale_affinity = math.sqrt(math.log(boundary_affinity)/math.log(threshold_affinity_upper))
 
-dataset_name = 'ICDAR2013_ICDAR2017'
-test_dataset_name = 'ICDAR2013'
 
 print(
 	'Boundary character value = ', boundary_character,
@@ -39,17 +45,10 @@ print(
 print('Scale character value = ', scale_character, '| Scale affinity value = ', scale_affinity)
 print('Training Dataset = ', dataset_name, '| Testing Dataset = ', test_dataset_name)
 
-DataLoaderSYNTH_base_path = '/home/SharedData/Mayank/SynthText/Images'
-DataLoaderSYNTH_mat = '/home/SharedData/Mayank/SynthText/gt.mat'
-DataLoaderSYNTH_Train_Synthesis = '/home/SharedData/Mayank/Models/SYNTH/train_synthesis/'
-
-DataLoader_Other_Synthesis = '/home/SharedData/Mayank/'+dataset_name+'/Save/'
-Other_Dataset_Path = '/home/SharedData/Mayank/'+dataset_name
-save_path = '/home/SharedData/Mayank/Models/WeakSupervision/'+dataset_name
+Other_Dataset_Path = os.path.join('./input/', dataset_name)
+save_path = os.path.join('./model/weak_supervision/', dataset_name)
 images_path = '/home/SharedData/Mayank/'+dataset_name+'/Images'
-target_path = '/home/SharedData/Mayank/'+dataset_name+'/Generated'
-
-Test_Dataset_Path = '/home/SharedData/Mayank/'+test_dataset_name
+target_path = os.path.join('./input', dataset_name, 'generated')
 
 threshold_word = 0.7
 threshold_fscore = 0.5
@@ -73,6 +72,16 @@ dataset_pre_process = {
 		'test': {
 			'target_json_path': None,
 			'target_folder_path': None,
+		}
+	},
+	'datapile': {
+		'train': {
+			'target_json_name': 'train_gt.json',
+			'base_path': './input/datapile/train/',
+		},
+		'test': {
+			'target_json_name': 'test_gt.json',
+			'base_path': './input/datapile/test/',
 		}
 	}
 }
