@@ -8,7 +8,7 @@ test_dataset_name = 'datapile'
 
 DataLoader_VN_SYNTH_dataset_path = './input/SynthText.h5'
 DataLoader_VN_SYNTH_Train_Synthesis = './logs/train_synthesis/'
-num_epochs_strong_supervision = 20
+num_epochs_strong_supervision = 30
 
 THRESHOLD_POSITIVE = 0.1
 THRESHOLD_NEGATIVE = 0

@@ -10,7 +10,7 @@ ratio_split = 0.8
 #
 num_cuda = "0"
 save_path = './model'
-use_cuda = False
+use_cuda = True #False
 
 batch_size = {
 	'train': 4*len(num_cuda.split(',')),
@@ -22,7 +22,7 @@ num_workers = {
 	'test': 0
 }
 
-pretrained = False
+pretrained = True #False
 pretrained_path = './model/original.pkl'
 pretrained_loss_plot_training = './logs/loss_plot_training.npy'
 
