@@ -23,7 +23,7 @@ num_workers = {
 }
 
 pretrained = True #False
-pretrained_path = './model/original.pth'
+pretrained_path = './model/63000_model.pkl'
 pretrained_loss_plot_training = './logs/loss_plot_training.npy'
 
 optimizer_iteration = 4//len(num_cuda.split(','))
