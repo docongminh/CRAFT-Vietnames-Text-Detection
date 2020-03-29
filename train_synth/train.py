@@ -162,8 +162,10 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 						)
 					)
 			except Exception as e:
-				print(e)
-				pass
+				with open('error.log', 'w') as f:
+					print(">>>>VALIDATION LOG")
+					f.write(str(e))
+				continue
 
 		if len(all_accuracy) == 0:
 			iterator.set_description(
@@ -250,10 +252,15 @@ def main():
 		train_dataloader, batch_size=config.batch_size['train'],
 		shuffle=True, num_workers=config.num_workers['train'], worker_init_fn=_init_fn)
 	print('Loaded the dataloader')
-
-	all_loss = train(
-		train_dataloader, loss_criterian, model, optimizer, starting_no=starting_no,
-		all_loss=all_loss, all_accuracy=all_accuracy)
+	try:
+		all_loss = train(
+			train_dataloader, loss_criterian, model, optimizer, starting_no=starting_no,
+			all_loss=all_loss, all_accuracy=all_accuracy)
+	except Exception as err:
+		with open('train_error.log', 'w') as f:
+			print(">>>> WRITE ERROR LOG")
+			f.write(str(err))
+		continue
 
 	torch.save(
 		{
