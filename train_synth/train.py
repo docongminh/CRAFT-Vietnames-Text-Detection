@@ -165,7 +165,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 				with open('error.log', 'w') as f:
 					print(">>>>VALIDATION LOG")
 					f.write(str(e))
-				continue
+				pass
 
 		if len(all_accuracy) == 0:
 			iterator.set_description(
@@ -260,7 +260,7 @@ def main():
 		with open('train_error.log', 'w') as f:
 			print(">>>> WRITE ERROR LOG")
 			f.write(str(err))
-		continue
+		pass
 
 	torch.save(
 		{
