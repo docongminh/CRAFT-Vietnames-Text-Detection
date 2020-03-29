@@ -236,7 +236,8 @@ def main():
 		model.load_state_dict(saved_model['state_dict'])
 		optimizer.load_state_dict(saved_model['optimizer'])
 		starting_no = int(config.pretrained_path.split('/')[-1].split('_')[0])
-		all_loss = np.load(config.pretrained_loss_plot_training).tolist()
+		# all_loss = np.load(config.pretrained_loss_plot_training).tolist()
+		all_loss = []
 		print('Loaded the model')
 
 	else:
