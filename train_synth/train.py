@@ -151,7 +151,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 						scaling_affinity=config.scale_affinity,
 						scaling_character=config.scale_character
 					)
-
+					print(">>> PREDICT BBOX: ", predicted_bbox)
 					target_bbox = generate_word_bbox_batch(
 						weight.data.cpu().numpy(),
 						weight_affinity.data.cpu().numpy(),
@@ -164,12 +164,14 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 						scaling_character=config.scale_character
 
 					)
+					print(">>> TARGET BBOX: ", target_bbox)
 
 					all_accuracy.append(
 						calculate_batch_fscore(
 							predicted_bbox, target_bbox, threshold=config.threshold_fscore, text_target=None
 						)
 					)
+					print(">>>> ALL ACC: ", all_accuracy)
 			except Exception as e:
 				with open('error.log', 'w') as f:
 					print(">>>>VALIDATION LOG")
@@ -201,13 +203,12 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 			save(image, output, weight, weight_affinity, no)
 
 		if no % config.periodic_save == 0 and no != 0:
-
 			torch.save(
 				{
 					'state_dict': model.state_dict(),
 					'optimizer': optimizer.state_dict()
 				}, config.save_path + '/' + str(no) + '_model.pkl')
-
+			print(">>> SAVED...model")
 			np.save(config.save_path + '/loss_plot_training.npy', all_loss)
 			plt.plot(all_loss)
 			plt.savefig(config.save_path + '/loss_plot_training.png')
