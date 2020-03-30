@@ -38,9 +38,9 @@ lr = {
 
 num_epochs_strong_supervision = 1.2
 
-periodic_fscore = 300*optimizer_iteration
-periodic_output = 3000*optimizer_iteration
-periodic_save = 3000*optimizer_iteration
+periodic_fscore = 10 #300*optimizer_iteration
+periodic_output = 10 #3000*optimizer_iteration
+periodic_save = 10 #3000*optimizer_iteration
 
 visualize_generated = True
 visualize_freq = 21000
