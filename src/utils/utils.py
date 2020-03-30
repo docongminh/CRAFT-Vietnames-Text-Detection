@@ -506,8 +506,7 @@ def generate_word_bbox_batch(
 		character_threshold_upper,
 		affinity_threshold_upper,
 		scaling_affinity,
-		scaling_character
-	)
+		scaling_character):
 
 	"""
 
