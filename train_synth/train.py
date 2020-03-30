@@ -110,7 +110,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 	for no, (image, weight, weight_affinity) in enumerate(iterator):
 
 		change_lr(no)
-
+		print(">>>TEST No: ", no)
 		if config.pretrained:
 			if no == starting_no:
 				dataloader.start = True
