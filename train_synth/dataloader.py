@@ -59,7 +59,7 @@ class DataLoader_VN_SYNTH(data.Dataset):
             self.ids = self.ids[:1000]
 
         total_number = len(self.ids)
-        train_images = int(total_number * 0.9)
+        train_images = int(total_number * 0.7)
         print('Training with', train_images, 'images')
 
         if self.type_ == 'train':
