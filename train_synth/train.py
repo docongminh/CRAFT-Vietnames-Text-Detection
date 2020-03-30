@@ -131,7 +131,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 		if (no + 1) % config.optimizer_iteration == 0:
 			optimizer.step()
 			optimizer.zero_grad()
-		if no >= 2000:
+		if no >= 10: #2000
 
 			# Calculating the f-score after some iterations because initially there are a lot of stray contours
 			try:
@@ -146,6 +146,10 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 						character_threshold=config.threshold_character,
 						affinity_threshold=config.threshold_affinity,
 						word_threshold=config.threshold_word,
+						character_threshold_upper=config.threshold_character_upper,
+						affinity_threshold_upper=config.threshold_affinity_upper,
+						scaling_affinity=config.scale_affinity,
+						scaling_character=config.scale_character
 					)
 
 					target_bbox = generate_word_bbox_batch(
@@ -154,6 +158,11 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 						character_threshold=config.threshold_character,
 						affinity_threshold=config.threshold_affinity,
 						word_threshold=config.threshold_word,
+						character_threshold_upper=config.threshold_character_upper,
+						affinity_threshold_upper=config.threshold_affinity_upper,
+						scaling_affinity=config.scale_affinity,
+						scaling_character=config.scale_character
+
 					)
 
 					all_accuracy.append(
