@@ -132,6 +132,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 		if (no + 1) % config.optimizer_iteration == 0:
 			optimizer.step()
 			optimizer.zero_grad()
+		print(">>>TEST No: ", no)
 		if no >= 10: #2000
 			print(">>> NUMBER ITERATOR VALIDATION: ", no)
 			# Calculating the f-score after some iterations because initially there are a lot of stray contours
