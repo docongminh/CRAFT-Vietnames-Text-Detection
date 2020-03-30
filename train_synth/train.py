@@ -110,13 +110,13 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 	for no, (image, weight, weight_affinity) in enumerate(iterator):
 
 		change_lr(no)
-		print(">>>TEST No: ", no)
-		if config.pretrained:
-			if no == starting_no:
-				dataloader.start = True
-				continue
-			elif no < starting_no:
-				continue
+		# print(">>>TEST No: ", no)
+		# if config.pretrained:
+		# 	if no == starting_no:
+		# 		dataloader.start = True
+		# 		continue
+		# 	elif no < starting_no:
+		# 		continue
 
 		if config.use_cuda:
 			# image, weight, weight_affinity = image.cuda(), weight.cuda(), weight_affinity.cuda()
@@ -132,7 +132,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 		if (no + 1) % config.optimizer_iteration == 0:
 			optimizer.step()
 			optimizer.zero_grad()
-		print(">>>TEST No: ", no)
+		# print(">>>TEST No: ", no)
 		if no >= 10: #2000
 			print(">>> NUMBER ITERATOR VALIDATION: ", no)
 			# Calculating the f-score after some iterations because initially there are a lot of stray contours
