@@ -13,7 +13,7 @@ save_path = './model'
 use_cuda = True #False
 
 batch_size = {
-	'train': 4*len(num_cuda.split(',')),
+	'train': 16*len(num_cuda.split(',')),
 	'test': 8*len(num_cuda.split(',')),
 }
 
