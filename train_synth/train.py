@@ -111,12 +111,12 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 
 		change_lr(no)
 		# print(">>>TEST No: ", no)
-		# if config.pretrained:
-		# 	if no == starting_no:
-		# 		dataloader.start = True
-		# 		continue
-		# 	elif no < starting_no:
-		# 		continue
+		if config.pretrained:
+			if no == starting_no:
+				dataloader.start = True
+				continue
+			elif no < starting_no:
+				continue
 
 		if config.use_cuda:
 			# image, weight, weight_affinity = image.cuda(), weight.cuda(), weight_affinity.cuda()
