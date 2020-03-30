@@ -266,15 +266,15 @@ def main():
 		train_dataloader, batch_size=config.batch_size['train'],
 		shuffle=True, num_workers=config.num_workers['train'], worker_init_fn=_init_fn)
 	print('Loaded the dataloader')
-	try:
-		all_loss = train(
+	#try:
+	all_loss = train(
 			train_dataloader, loss_criterian, model, optimizer, starting_no=starting_no,
 			all_loss=all_loss, all_accuracy=all_accuracy)
-	except Exception as err:
-		with open('train_error.log', 'a') as f:
-			print(">>>> WRITE ERROR LOG")
-			f.write(str(err))
-		pass
+	#except Exception as err:
+	#	with open('train_error.log', 'a') as f:
+	#		print(">>>> WRITE ERROR LOG")
+	#		f.write(str(err))
+	#	pass
 
 	torch.save(
 		{

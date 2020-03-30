@@ -22,7 +22,7 @@ num_workers = {
 	'test': 0
 }
 
-pretrained = True #False
+pretrained = False #True #False
 pretrained_path = './model/63000_model.pkl'
 pretrained_loss_plot_training = './logs/loss_plot_training.npy'
 
