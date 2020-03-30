@@ -73,7 +73,7 @@ def resize_bbox(original_dim, output, config):
 		character_threshold_upper=config.threshold_character_upper,
 		affinity_threshold_upper=config.threshold_affinity_upper,
 		scaling_affinity=config.scale_affinity,
-		scaling_character=config.scale_character,
+		scaling_character=config.scale_character
 	)
 
 	generated_targets['word_bbox'] = generated_targets['word_bbox']*2
@@ -502,7 +502,12 @@ def generate_word_bbox_batch(
 		batch_affinity_heatmap,
 		character_threshold,
 		affinity_threshold,
-		word_threshold):
+		word_threshold,
+		character_threshold_upper,
+		affinity_threshold_upper,
+		scaling_affinity,
+		scaling_character
+	)
 
 	"""
 
@@ -529,7 +534,12 @@ def generate_word_bbox_batch(
 			batch_affinity_heatmap[i],
 			character_threshold,
 			affinity_threshold,
-			word_threshold)
+			word_threshold
+			character_threshold_upper,
+			affinity_threshold_upper,
+			scaling_affinity,
+			scaling_character
+		)
 
 		word_bbox.append(returned['word_bbox'])
 
