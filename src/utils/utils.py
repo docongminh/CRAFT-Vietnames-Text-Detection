@@ -533,7 +533,7 @@ def generate_word_bbox_batch(
 			batch_affinity_heatmap[i],
 			character_threshold,
 			affinity_threshold,
-			word_threshold
+			word_threshold,
 			character_threshold_upper,
 			affinity_threshold_upper,
 			scaling_affinity,
