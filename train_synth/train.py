@@ -173,7 +173,7 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 					)
 					print(">>>> ALL ACC: ", all_accuracy)
 			except Exception as e:
-				with open('error.log', 'w') as f:
+				with open('error.log', 'a') as f:
 					print(">>>>VALIDATION LOG")
 					f.write(str(e))
 				pass
@@ -268,7 +268,7 @@ def main():
 			train_dataloader, loss_criterian, model, optimizer, starting_no=starting_no,
 			all_loss=all_loss, all_accuracy=all_accuracy)
 	except Exception as err:
-		with open('train_error.log', 'w') as f:
+		with open('train_error.log', 'a') as f:
 			print(">>>> WRITE ERROR LOG")
 			f.write(str(err))
 		pass
