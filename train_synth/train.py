@@ -132,11 +132,11 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 			optimizer.step()
 			optimizer.zero_grad()
 		if no >= 10: #2000
-
+			print(">>> NUMBER ITERATOR VALIDATION: ", no)
 			# Calculating the f-score after some iterations because initially there are a lot of stray contours
 			try:
 				if no % config.periodic_fscore == 0:
-
+					print("\t>>>periodic_fscore: ", config.periodic_fscore)
 					if type(output) == list:
 						output = torch.cat(output, dim=0)
 
