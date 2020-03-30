@@ -15,7 +15,7 @@ from src.utils.utils import calculate_batch_fscore, generate_word_bbox_batch, _i
 
 
 os.environ['CUDA_VISIBLE_DEVICES'] = str(config.num_cuda)
-
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def save(data, output, target, target_affinity, no):
 
@@ -119,7 +119,8 @@ def train(dataloader, loss_criterian, model, optimizer, starting_no, all_loss, a
 				continue
 
 		if config.use_cuda:
-			image, weight, weight_affinity = image.cuda(), weight.cuda(), weight_affinity.cuda()
+			# image, weight, weight_affinity = image.cuda(), weight.cuda(), weight_affinity.cuda()
+			image, weight, weight_affinity = image.to(device), weight.to(device), weight_affinity.to(device)
 
 		output = model(image)
 		loss = loss_criterian(output, weight, weight_affinity).mean()/config.optimizer_iteration
@@ -237,7 +238,8 @@ def main():
 	loss_criterian = DataParallelCriterion(Criterian())
 
 	if config.use_cuda:
-		model = model.cuda()
+		# model = model.cuda()
+		model = model.to(device)
 
 	optimizer = torch.optim.Adam(model.parameters(), lr=config.lr[1])
 
